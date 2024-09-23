@@ -1,0 +1,50 @@
+.main{
+    margin: 0;
+    padding:  0;
+    padding: 1em;
+}
+
+.title{
+    font-size: 20px;
+    font-weight: 600;
+   
+}
+.header{
+    display: flex;
+    text-align: center;
+    justify-content:space-between ;
+}
+
+td{ 
+    padding:0.5em;
+}
+   
+.animation{
+    opacity: 1;
+    animation: fade 1s linear;
+}
+
+@keyframes fade{
+    0%, 100% {opacity: 0;}
+    50% {opacity: 1;}
+}
+
+
+.demo-only{ 
+    display: none;
+}
+
+.slds-is-relative{
+    display: block;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+.spiner{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}

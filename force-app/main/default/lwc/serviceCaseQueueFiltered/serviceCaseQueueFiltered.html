@@ -1,0 +1,62 @@
+<template>
+    <div class="main" >
+        <lightning-card style="position:relative">
+          <div class="main">
+            <div class="header">
+                <h2 class="title">Case Queue Service</h2>
+                <div class="btn">
+                    <lightning-button-icon icon-name="utility:refresh"  label="reload" onclick={reloadPage}></lightning-button-icon>
+                </div>
+            </div>
+            <div style="height: 800px;">
+                <lightning-datatable
+                        key-field="id"
+                        data={data}
+                        columns={columns}>
+                </lightning-datatable>
+            </div>
+            <!-- <table class="table">
+                <thead>
+                    <tr class="table-head">
+                        <th class="col-head-num col-head-bold">#</th>
+                        <th class="col-head-case col-text col-head-bold">Case Number</th>
+                        <th class="col-head-ass col-text col-head-bold">Assignee</th>
+                        <th class="col-head-status col-text col-head-bold">Case status</th>
+                        <th class="col-head-pr col-text col-head-bold">Priority</th>
+                        <th class="col-head-or col-text col-head-bold">Origin</th>
+                    </tr>
+                </thead>
+                <tbody class="table-data">
+                    
+                    <template for:each={cases} for:item="cs" for:index="index">
+                        
+                        <tr class="caseTable" key={cs.Id} data-id={cs.Id}>
+                            <td class="num col-data-num col-text">
+                                <c-case-numeric numeric = {index}></c-case-numeric>
+                            </td>
+                            <td class="col-data-case col-text col-data-hover">
+                                <c-case-navigation cs={cs}></c-case-navigation>
+                              
+                            </td>
+                            <td class="col-data-ass col-text">{cs.Owner_Name__c}</td>
+                            <td class="col-data-status col-text col-data-hover">
+                                <c-case-combobox cs={cs}></c-case-combobox>
+                            </td>
+                            <td class="col-data-pr col-text">{cs.Priority}</td>
+                            <td class="col-data-or col-text">{cs.Origin}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table> -->
+
+
+
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+                </lightning-spinner>
+           </template>
+          </div>
+        </lightning-card>
+    </div>
+    
+</template>

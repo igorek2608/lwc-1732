@@ -1,0 +1,29 @@
+<apex:page controller="AccountCasesPdfCtrl" renderAs="pdf">
+    <apex:dataTable value="{!AccountCasesPrevWeek}" var="case" id="theTable" rowClasses="odd,even"  >
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header"> Account Name</apex:facet>
+            <apex:outputText value="{!case.Account_Name__c}"></apex:outputText>
+        </apex:column>
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header"> Owner Name</apex:facet>
+            <apex:outputText value="{!case.Owner_Name__c}"></apex:outputText>
+        </apex:column>
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header"> Case Number</apex:facet>
+            <apex:outputText value="{!case.CaseNumber}"></apex:outputText>
+        </apex:column>
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header">Status</apex:facet>
+            <apex:outputText value="{!case.Status}"></apex:outputText>
+        </apex:column>
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header"> Priority</apex:facet>
+            <apex:outputText value="{!case.Priority}"></apex:outputText>
+        </apex:column>
+        <apex:column style="border:1px solid black">
+            <apex:facet name="header"> Origin</apex:facet>
+            <apex:outputText value="{!case.Origin}"></apex:outputText>
+        </apex:column>
+
+    </apex:dataTable>
+</apex:page>
