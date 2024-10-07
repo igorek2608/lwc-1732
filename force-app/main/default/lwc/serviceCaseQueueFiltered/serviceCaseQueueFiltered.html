@@ -4,16 +4,38 @@
           <div class="main">
             <div class="header">
                 <h2 class="title">Case Queue Service</h2>
-                <div class="btn">
-                    <lightning-button-icon icon-name="utility:refresh"  label="reload" onclick={reloadPage}></lightning-button-icon>
+                <div class="slds-p-around_medium">
+                    <lightning-button-icon onclick={handleRefresh} class="slds-float_right" icon-name="utility:rotate"></lightning-button-icon>
                 </div>
             </div>
-            <div style="height: 800px;">
-                <lightning-datatable
-                        key-field="id"
-                        data={data}
-                        columns={columns}>
-                </lightning-datatable>
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            
+          <!--   <div class="slds-p-around_medium slds-m-top_medium">
+                <c-custom-data-table class="slds-max-medium-table_stacked" 
+                   
+                    data={data} 
+                    columns={columns} 
+                    key-field="Id" 
+                    data-record="Id" 
+                    show-row-number-column="false"
+                    hide-checkbox-column="true">
+                </c-custom-data-table>
+            </div> -->
+
+
+            <div>
+                <c-custom-data-table class="slds-max-medium-table_stacked"
+                    onvaluechange={handleValueChange}
+                    data={cases} 
+                    columns={columns} 
+                    key-field="Id" 
+                    data-record="Id" 
+                    show-row-number-column="false"
+                    hide-checkbox-column="true"
+                >
+                </c-custom-data-table>
             </div>
             <!-- <table class="table">
                 <thead>
@@ -51,10 +73,10 @@
 
 
 
-            <template if:true={isLoading}>
+            <!-- <template if:true={isLoading}>
                 <lightning-spinner alternative-text="Loading" variant="brand" size="large">
                 </lightning-spinner>
-           </template>
+           </template> -->
           </div>
         </lightning-card>
     </div>

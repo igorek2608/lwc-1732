@@ -2,87 +2,134 @@
 import { LightningElement, track, wire, api } from "lwc";
 import getUserCases from "@salesforce/apex/ServiceCaseQueueService.getUserCases";
 import { subscribe, unsubscribe, onError } from "lightning/empApi";
+import generateServiceCaseData from './generateServiceCaseData';
+import { refreshApex } from '@salesforce/apex';
+import { getObjectInfo } from "lightning/uiObjectInfoApi";
+import { updateRecord } from 'lightning/uiRecordApi';
+import CASE_OBJECT from '@salesforce/schema/Case';
+import STATUS_FIELD from "@salesforce/schema/Case.Status";
+import { getPicklistValues } from "lightning/uiObjectInfoApi";
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 
-
+ 
 
 
 
 
 export default class ServiceCaseQueueFiltered extends LightningElement() {
-    cases;
-    subscription = {};
-    channelName = "/event/Case_Changed__e";
+       columns = [
+        { label: 'Case Number', fieldName: 'CaseNumberUrl', type: 'url', sortable: false, typeAttributes: { label: { fieldName: 'CaseNumber' }, target: '_blank' } },
+        { label: 'Assignee', fieldName: 'Owner_Name__c', type: 'text', sortable: false },
+        { label: 'Priority', fieldName: 'Priority', type: 'text', sortable: false },
+        { label: 'Origin', fieldName: 'Origin', type: 'text', sortable: false },
+
+    ];
+    @track cases = [];
+    statusOptions = [];
     isLoading = false;
-    
+    defaultRecordTypeId;
+   
 
-    connectedCallback() {
-        this.getUserCasesAll();
-        this.handleSubscribe();
-        this.registerErrorListener();
+    @wire(getObjectInfo, { objectApiName: CASE_OBJECT })
+    getCaseInfo({ data, error }) {
+        if (data) {
+            console.log('getCaseInfo')
+           
+            this.defaultRecordTypeId = data.defaultRecordTypeId;
+             console.log(this.defaultRecordTypeId)
+        }
+        else if (error) {
+            console.log(error);
+        }
+    };
+
+    @wire(getPicklistValues, { recordTypeId: '$defaultRecordTypeId', fieldApiName: STATUS_FIELD })
+    wiredGetStatusOptions({ data, error }) {
+        if (data) {
+            this.statusOptions = data.values;
+            this.columns = [
+                ...this.columns.slice(0, 2),
+                {
+                    label: 'Case Status',
+                    fieldName: 'Status',
+                    type: 'picklist',
+                    editable: false,
+                    typeAttributes: {
+                        placeholder: 'Choose Status',
+                        options: this.statusOptions,
+                        value: { fieldName: 'Status' },
+                        context: { fieldName: 'Id' },
+                        variant: 'label-hidden',
+                        name: 'Status',
+                        label: 'Case Status'
+                    }
+                },
+                ...this.columns.slice(2)
+            ];
+
+            console.log('col')
+            console.log(this.columns)
+        }
+        if (error) {
+            console.log(error)
+        }
     }
 
-    getUserCasesAll() {
-        getUserCases()
-            .then((result) => {
-                console.log(result)
-                this.isLoading = false;
-                this.cases = result;
-            })
-            .catch((error) => {
-                this.error = error;
-            });
+    wiredCases;
+    @wire(getUserCases)
+    wiredGetUserCases(wireResult) {
+        const { data, error } = wireResult;
+        this.wiredCases = wireResult;
+        console.log(data)
+        this.isLoading = true;
+        if (data) {
+            this.cases = data.map(record => ({
+                ...record,
+                CaseNumberUrl: `/${record.Id}`,
+            }));
+            
+        }
+        if (error) {
+            console.log(error)
+        }
+        this.isLoading = false;
     }
 
-    reloadPage() {
-        console.log('reload')
-        setTimeout(() => {
-            console.log(this.isLoading)
-            this.isLoading = true;
-            this.getUserCasesAll();
-            console.log(this.isLoading)
-        }, 1000);
-    }
-
-    handleSubscribe() {
-        const thisContext  = this;
-        const messageCallback = function (response) {
-            thisContext .handleEvent(response);
+    handleValueChange(event) {
+        const updatedCaseRecord = {
+            fields: {
+                Id: event.detail.data.context,
+                Status: event.detail.data.value
+            }
         };
-
-        subscribe(this.channelName, -1, messageCallback)
-            .then((response) => {
-                thisContext.subscription = response;
-                thisContext.handleEvent();
+        console.log('handleValueChange')
+        console.log(event)
+        console.log(updatedCaseRecord)
+        updateRecord(updatedCaseRecord)
+            .then(() => {
+                this.showToast('Success', 'Record updated successfully', 'success');
+                this.handleRefresh();
             })
-            .catch((e) => {
-                console.log(e);
-            });
+            .catch(error => {
+                this.showToast('Error updating record', error.body.message, 'error');
+            })
     }
 
-    registerErrorListener() {
-        // Invoke onError empApi method
-        onError((error) => {
-            console.log("Received error from server: ", JSON.stringify(error));
-            // Error contains the server-side error
+    handleRefresh() {
+        this.isLoading = true;
+        refreshApex(this.wiredCases).finally(() => {
+            this.isLoading = false;
         });
     }
 
-    handleEvent = (response) => {
-        setTimeout(() => {
-            const that = this;
-            const actions = response && response.data && response.data.payload && response.data.payload.Action__c ? response.data.payload.Action__c : '';
-            if (
-                actions === "Update" ||
-                actions === "Insert" ||
-                actions === "Delete"
-            ) {
-
-                console.log('loading')
-                console.log(this.isLoading)
-                this.isLoading = true;
-                return that.getUserCasesAll();
-            }
-        }, 2000);
-    };
+    showToast(title, message, variant) {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: title,
+                message: message,
+                variant: variant
+            })
+        );
+    }
 }

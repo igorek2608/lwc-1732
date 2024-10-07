@@ -1,0 +1,14 @@
+.slds-grid .slds-truncate {
+    width: 100%
+}
+
+.picklist-container{
+    margin-top: -1rem;
+    margin-left: -0.5rem;
+    position: absolute !important;
+    z-index: 10000;
+}
+
+.align-button{
+    margin-left: 5rem;
+}

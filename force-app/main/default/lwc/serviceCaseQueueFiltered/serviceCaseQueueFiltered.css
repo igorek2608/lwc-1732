@@ -13,9 +13,10 @@
     display: flex;
     text-align: center;
     justify-content:space-between ;
+    align-items: center;
 }
 
-td{ 
+td { 
     padding:0.5em;
 }
    
@@ -41,10 +42,4 @@ td{
     top:50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-}
-.spiner{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
 }
